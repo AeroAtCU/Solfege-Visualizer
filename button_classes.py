@@ -6,7 +6,7 @@
 # probably want to define panes within the window. idk how.
 # pack can work withing a frame, and within a... widget
 
-#within the frame, I want a grid (?) using *rowconfigure*
+#within the frame, I want a grid (?) using *rowconfigure* 
 import numpy as np
 import tkinter as tk
 
@@ -18,10 +18,16 @@ def key_downdict(event):
     # switch event.keypress_name, case d... 1
     print(event)
     view.buttons["do"].configure(bg='blue')
+    view.buttons["di"].configure(bg='blue')
+    view.buttons["se"].configure(bg='blue')
+    view.buttons["ti"].configure(bg='blue')
 
 def key_updict(event):
     print(event)
     view.buttons["do"].configure(bg=view.main_sfg_bg)
+    view.buttons["di"].configure(bg=view.main_sfg_bg)
+    view.buttons["se"].configure(bg=view.main_sfg_bg)
+    view.buttons["ti"].configure(bg=view.main_sfg_bg)
 
 # How do I explicitely pass 'view' into this?
 # I think that's all I need now...
@@ -35,8 +41,12 @@ def key_up(event):
     print(event)
     view.buttons[3].configure(bg=view.main_sfg_bg)
 
+
 # (tk.Frame) just means in inherets all the attributes from tk.Frame.
 # It's not like a function argument.
+# purpose of this function is to create a solfege frame
+# output: dict of {"solfege syllable": tk.Button(Frame,...)
+# Foor easy handling on events.
 class sfg_frame(tk.Frame):
     main_sfg_bg = "grey"
     flat_sfg_bg = "grey"
@@ -67,31 +77,38 @@ class sfg_frame(tk.Frame):
         # Create main solfege buttons
         # what ddoes .items() do again?
         # We use .items() to...
+        i = 1
         for sfg_item in self.main_sfg_names.items():
             sfg_syllable = sfg_item[0]
-            sfg_number = sfg_item[1]
 
             # Create the buttons, organize them
             new_button = tk.Button(self, text=sfg_syllable, bg=self.main_sfg_bg)
-            new_button.grid(row=12-sfg_number,column=2, rowspan=1, columnspan=1)
+            new_button.grid(row=12-i,column=1, rowspan=1, columnspan=1)
             self.buttons[sfg_syllable] = new_button
+            i+=1
 
         # Create sharp solfege buttons
+        i = 1
         for sfg_item in self.sharp_sfg_names.items():
             sfg_syllable = sfg_item[0]
-            sfg_number = sfg_item[1]
+            if sfg_syllable == "fi":
+                i+= 1
 
             new_button = tk.Button(self, text=sfg_syllable, bg=self.main_sfg_bg)
-            new_button.grid(row=12-sfg_number, column=3, rowspan=2, columnspan=1)
+            new_button.grid(row=11-i, column=2, rowspan=2, columnspan=1)
             self.buttons[sfg_syllable] = new_button
+            i+=1
 
+        i = 1
         for sfg_item in self.flat_sfg_names.items():
             sfg_syllable = sfg_item[0]
-            sfg_number = sfg_item[1]
+            if sfg_syllable == "se":
+                i+= 1
 
             new_button = tk.Button(self, text=sfg_syllable, bg=self.main_sfg_bg)
-            new_button.grid(row=12-sfg_number, column=1, rowspan=2, columnspan=1)
+            new_button.grid(row=11-i, column=0, rowspan=2, columnspan=1)
             self.buttons[sfg_syllable] = new_button
+            i += 1
 
 
 
