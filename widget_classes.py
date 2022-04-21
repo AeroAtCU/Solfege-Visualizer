@@ -9,7 +9,7 @@
 #within the frame, I want a grid (?) using *rowconfigure* 
 import numpy as np
 import tkinter as tk
-import sfgDF as solfege_DF
+import sfgDF_class as sfgDF_class
 
 
 def cmd_sfg(sfg, key="c"):
@@ -44,35 +44,34 @@ def key_up(event):
 # output: dict of {"solfege syllable": tk.Button(Frame,...)
 # Foor easy handling on events.
 class sfgFrame(tk.Frame):
-
-    buttons = {}
-
     # Ran every time a new instance is created.
     # 'self' is ignored when we call Class.function
     # 'root' is from when we create the specific instance.
     def __init__(self, root, debug_text="debug text"):
         # Create a new dataframe to keep track of the buttons
         # and other constants
-        self.sfgDF_class = solfege_DF.sfgDF()
-        self.sfgDF = self.sfgDF_class.sfg_dict
-
+        self.sfgDF = sfgDF_class.sfgDF()
 
         # Create the frame in which we will put all the sfg buttons
         # still don't get the Frame.__init but it's part of Frame
         tk.Frame.__init__(self, root)
 
         # what does .items() do again?
-        for sfg_item in self.sfgDF.items():
+        for sfg_item in self.sfgDF.sfg_dict.items():
+            # Extract the syllable and dict of data
             syllable = sfg_item[0]
-            row = sfg_item[1]["row"]
-            column = sfg_item[1]["column"]
-            bgcolor = sfg_item[1]["bgcolor"]
+            syllable_data = sfg_item[1]
 
+            # for readabiility, extract the information used
+            row = syllable_data["row"]
+            column = syllable_data["column"]
+            rowspan = syllable_data["rowspan"]
+            bgcolor = syllable_data["bgcolor"]
+
+            # create the button, add it to the Frame grid, & store the obj in it's syllables dict
             new_button = tk.Button(self, text=syllable, bg=bgcolor)
-            new_button.grid(row=row,column=column, rowspan=1, columnspan=1)
-            self.sfgDF[syllable]["tkButton"] = new_button
-
-
+            new_button.grid(row=row,column=column, rowspan=rowspan, columnspan=1)
+            self.sfgDF.sfg_dict[syllable]["tkButton"] = new_button
 
 
 # fails is window.destroy is root.destroy...
@@ -93,16 +92,7 @@ if __name__=='__main__':
 
     view = sfgFrame(window)
     view.pack(side="top", fill="both", expand=True)
-    print(view.sfgDF["le"]["tkButton"])
+    print(view.sfgDF.sfg_dict["le"]["tkButton"])
     print(view.sfgDF_class.sfg_dict["le"]["tkButton"])
 
-    print(view.sfgDF["le"]["tkButton"] is view.sfgDF_class.sfg_dict["le"]["tkButton"])
-   #print(view.main_sfg_names)
-
-   #window.bind("a", key_down)
-   #window.bind("<KeyRelease-a>", key_up)
-   #window.bind("b", key_downdict)
-   #window.bind("<KeyRelease-b>", key_updict)
-
-   ## How to dynamically change some variable in there?
-    window.mainloop()
+    print(view.sfgDF.sfg_dict["le"]["tkButton"] is view.sfgDF_class.sfg_dict["le"]["tkButton"])
