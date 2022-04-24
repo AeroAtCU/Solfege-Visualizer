@@ -1,59 +1,20 @@
-# https://www.pythontutorial.net/tkinter/tkinter-grid/
-# https://www.guru99.com/python-dictionary-append.html#6
-# https://www.delftstack.com/tutorial/tkinter-tutorial/tkinter-geometry-managers/
-# https://www.geeksforgeeks.org/dynamically-resize-buttons-when-resizing-a-window-using-tkinter/
-# def want .place(relx=X%, rely=Y%)
-# probably want to define panes within the window. idk how.
-# pack can work withing a frame, and within a... widget
-
-#within the frame, I want a grid (?) using *rowconfigure* 
 import numpy as np
 import tkinter as tk
 import sfgDF_class as sfgDF_class
+# Should I just turn this whole thing into a function instead of a class? All it does is loop thru the sfgDF and create buttons... yea
+# Just have it return [tk.Frame, sfgDF]. right? and just store anything else I need in the sfgDF like octave or whatever. doesn't need to be a whole class.
 
-
-def cmd_sfg(sfg, key="c"):
-    print("Button pressed...")
-
-
-def key_downdict(event):
-    # switch event.keypress_name, case d... 1
-    print(event)
-    view.buttons["do"].configure(bg='blue')
-
-def key_updict(event):
-    print(event)
-    view.buttons["do"].configure(bg=view.main_sfg_bg)
-
-# How do I explicitely pass 'view' into this?
-# I think that's all I need now...
-# Also need to switch/ case on key_down
-def key_down(event):
-    # switch event.keypress_name, case d... 1
-    print(event)
-    view.buttons[3].configure(bg='blue')
-
-def key_up(event):
-    print(event)
-    view.buttons[3].configure(bg=view.main_sfg_bg)
-
-
-# (tk.Frame) just means in inherets all the attributes from tk.Frame.
-# It's not like a function argument.
-# purpose of this function is to create a solfege frame
+# (tk.Frame) just means in inherets all the attributes from tk.Frame.  It's not like a function argument.
+# Purpose: create a Frame which contains the entire solfege "stack" and the corresponding sfgDF that contains o create a solfege frame... wait
 # output: dict of {"solfege syllable": tk.Button(Frame,...)
-# Foor easy handling on events.
+# For easy handling on events.
 class sfgFrame(tk.Frame):
-    # Ran every time a new instance is created.
-    # 'self' is ignored when we call Class.function
-    # 'root' is from when we create the specific instance.
     def __init__(self, root, debug_text="debug text"):
-        # Create a new dataframe to keep track of the buttons
-        # and other constants
+        # Create a new dataframe to keep track of the buttons and other constants
         self.sfgDF = sfgDF_class.sfgDF()
 
         # Create the frame in which we will put all the sfg buttons
-        # still don't get the Frame.__init but it's part of Frame
+        # Accessible directly from the sfgFrame object
         tk.Frame.__init__(self, root)
 
         # what does .items() do again?
@@ -74,25 +35,7 @@ class sfgFrame(tk.Frame):
             self.sfgDF.sfg_dict[syllable]["tkButton"] = new_button
 
 
-# fails is window.destroy is root.destroy...
-# so somehow the literal word "root" is being
-# transferred over
-# But the name *doesn't* matter in BasicView
-def close_win(e):
-    print("exiting window...")
-    window.destroy()
-
 
 # for internal testing...
 if __name__=='__main__':
     pass
-    window = tk.Tk()
-    window.geometry("700x350")
-    window.bind('q', lambda e: close_win(e))
-
-    view = sfgFrame(window)
-    view.pack(side="top", fill="both", expand=True)
-    print(view.sfgDF.sfg_dict["le"]["tkButton"])
-    print(view.sfgDF_class.sfg_dict["le"]["tkButton"])
-
-    print(view.sfgDF.sfg_dict["le"]["tkButton"] is view.sfgDF_class.sfg_dict["le"]["tkButton"])
