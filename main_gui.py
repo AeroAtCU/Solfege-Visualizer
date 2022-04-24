@@ -11,18 +11,10 @@
 import tkinter as tk
 import widget_classes as widget_classes
 #import keybind_helper as keybind_helper
+ALL_SOLFEGE = set(["do", "re", "mi", "fa", "so", "la", "ti", "di", "ri", "fi", "si", "li", "ra", "me", "se", "le", "te"])
+VALID_KEYS = set(["d", "d", "i", "e", "r", "m", "f", "s", "l", "t"])
+GLOBAL_STATE = { "keys": set() }
 
-# what I want is to say "when i press 'a', light up these specific things... when i press 'b' light up these specific things... so i probably want something like:
-# buttons_to_activate = [sfgFrame1.sfgDF["do"], kbrdFrame.key("do"), handFrame.handDF["index"]
-# But everything except for the solfege is dynamically changing with the key... so... I still think this is the way to go. alternatively I can say
-# def keypress(sfgSyllable):
-# if syllable = "do"...
-
-# OR I can just have doKeypressed()
-
-# I do think a dynamically changing global key would be valuable
-
-#also gotta figure out the keyboard mod thing (what?)
 
 # No matter what, I need to pass information into the keypress function.
 def kd(event, sfgFrame):
@@ -31,19 +23,7 @@ def kd(event, sfgFrame):
 def ku(event, sfgFrame):
     sfgFrame.sfgDF["do"]["tkButton"].configure(bg=sfgFrame.sfgDF["do"]["bgcolor"])
 
-def key_downdict(event):
-    # switch event.keypress_name, case d... 1
-    print(event)
-    sfgFrame1.sfgDF["do"]["tkButton"].configure(bg=sfgFrame1.sfgDF["do"]["activecolor"])
-
-def key_updict(event):
-    print(event)
-    sfgFrame1.sfgDF["do"]["tkButton"].configure(bg=sfgFrame1.sfgDF["do"]["bgcolor"])
-
-# How do I explicitely pass 'view' into this?
 # I think that's all I need now...
-# Also need to switch/ case on key_down
-
 def close_win(e):
     print("exiting window...")
     window.destroy()
@@ -59,16 +39,63 @@ sfgFrame2 = widget_classes.sfgFrame(window)
 sfgFrame1.pack(side="left")
 sfgFrame2.pack(side="right")
 
-window.bind("b", key_downdict)
-window.bind("<KeyRelease-b>", key_updict)
 
 # okay, this allows me to send info to the function now alongwith the event
 window.bind("c", lambda event: kd(event=event, sfgFrame=sfgFrame2))
 window.bind("<KeyRelease-c>", lambda event: ku(event=event, sfgFrame=sfgFrame2))
 
-print(type(sfgFrame1))
-print(type(sfgFrame1.sfgDF))
+# window.bind("b", key_downdict)
+window.bind("b", lambda e: key_updict(e))
+window.bind("<KeyRelease-b>", lambda e: key_updict(e))
+
+
+def key_press_event(event):
+    GLOBAL_STATE["keys"].add(event.keysym)
+    print(f"Key pressed: {GLOBAL_STATE}")
+
+    refresh_solfege_ui()
+
+
+def key_release_event(event):
+    print(f"Key released: {GLOBAL_STATE}")
+    GLOBAL_STATE["keys"].remove(event.keysym)
+
+    refresh_solfege_ui()
+
+
+def refresh_solfege_ui():
+    active_solfege = get_solfege_from_keys_down(GLOBAL_STATE["keys"])
+    inactive_solfege = ALL_SOLFEGE - active_solfege
+
+    for solfege in active_solfege:
+        sfgFrame1.sfgDF[solfege]["tkButton"].configure(bg=sfgFrame1.sfgDF[solfege]["activecolor"])
+
+    for solfege in inactive_solfege:
+        sfgFrame1.sfgDF[solfege]["tkButton"].configure(bg=sfgFrame1.sfgDF[solfege]["bgcolor"])
+
+
+def get_solfege_from_keys_down(keys):
+    """
+    Translate from some number of keys down to solfege strings
+    """
+    ret = set()
+
+    if set(["i", "d"]).issubset(keys):
+        ret.add("di")
+    elif set(["d"]).issubset(keys):
+        ret.add("do")
+
+    if set(["r", "e"]).issubset(keys):
+        ret.add("ra")
+    elif set(["r"]).issubset(keys):
+        ret.add("re")
+
+    print(f"the solfeges down are: {ret}")
+    return ret
+
+for k in VALID_KEYS:
+    window.bind(k, key_press_event)
+    window.bind(f"<KeyRelease-{k}>", key_release_event)
 
 # To access the buttons: sfgFrame.sfgDF.sfg_dict["do"]
-
 window.mainloop()
