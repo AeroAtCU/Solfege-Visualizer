@@ -32,16 +32,17 @@ def close_win(e):
 window = tk.Tk()
 window.geometry("700x400")
 window.bind('q', lambda e: close_win(e))
+window.bind('j', lambda e: close_win(e))
 
-# might want to edit sfgFrame to have it's own explicit self.tkFrame object... not sure how we can do sfgFrame.pack() but I think it works bc we're passing in tk.Frame in the class defn so it inherets all tk.Frame commands and it just... works?a
+# Create and display some sfg widgets
 sfgFrame1 = widget_classes.sfgFrame(window)
+sfgFrame2 = widget_classes.sfgFrame(window)
 sfgFrame1.pack(side="left")
+sfgFrame2.pack(side="right")
 
 window.bind("b", key_downdict)
 window.bind("<KeyRelease-b>", key_updict)
 
-sfgFrame2 = widget_classes.sfgFrame(window)
-sfgFrame2.pack(side="right")
 print(type(sfgFrame1))
 print(type(sfgFrame1.sfgDF))
 
